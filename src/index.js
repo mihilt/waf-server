@@ -1,3 +1,7 @@
-const app = require('./config/express');
+require('dotenv').config();
 
-app.listen(8080, () => console.log('server started on port 8080'));
+const app = require('./config/express');
+const { port, env } = require('./config/vars');
+
+// eslint-disable-next-line no-console
+app.listen(port, () => console.log(`server started on port ${port} (${env})`));
