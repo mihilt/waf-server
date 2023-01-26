@@ -18,4 +18,12 @@ app.use(cors());
 
 app.use('/v1', routes);
 
+app.use((err, req, res, next) => {
+  // eslint-disable-next-line no-console
+  console.error(err);
+  const status = err.statusCode || 500;
+  const { message, data } = err;
+  res.status(status).json({ message, data });
+});
+
 module.exports = app;

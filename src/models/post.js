@@ -5,6 +5,23 @@ const { Schema } = mongoose;
 // TODO: need to add sequence, author (ip), date
 const postSchema = new Schema(
   {
+    postId: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    ip: {
+      type: String,
+      required: true,
+    },
+    author: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -15,6 +32,7 @@ const postSchema = new Schema(
     },
   },
   {
+    timestamps: true,
     versionKey: false,
   },
 );
