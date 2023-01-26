@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-// TODO: need to add sequence, author (ip), date
 const postSchema = new Schema(
   {
     postId: {
@@ -29,6 +28,10 @@ const postSchema = new Schema(
     contents: {
       type: String,
       required: true,
+    },
+    deleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {

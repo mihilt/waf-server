@@ -4,8 +4,13 @@ const Post = require('../models/post');
 exports.getPost = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const post = await Post.findById(postId);
-    const { _id, ...result } = post.toObject();
+    const post = await Post.findOne({ postId, deleted: false });
+    if (!post) {
+      const err = new Error('Post not found');
+      err.statusCode = 404;
+      throw err;
+    }
+    const { _id, password, ...result } = post.toObject();
     res.status(200).json(result);
   } catch (err) {
     next(err);
