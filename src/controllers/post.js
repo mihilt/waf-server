@@ -1,6 +1,24 @@
 const { checkRequiredFields, getNextSequence } = require('../utils');
 const Post = require('../models/post');
 
+exports.getPosts = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const posts = await Post.find({ deleted: false })
+      .sort({ postId: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const count = await Post.countDocuments({ deleted: false });
+    const result = posts.map(post => {
+      const { _id, password, contents, deleted, ...rest } = post.toObject();
+      return rest;
+    });
+    res.status(200).json({ result, count });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getPost = async (req, res, next) => {
   try {
     const { postId } = req.params;
