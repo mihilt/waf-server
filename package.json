@@ -2,9 +2,12 @@
   "name": "waf-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "start": "nodemon ./src/index.js"
+    "start": "node .",
+    "dev": "nodemon .",
+    "docs": "apidoc -i src -o docs",
+    "postdocs": "open-cli docs/index.html"
   },
   "keywords": [],
   "author": "",
@@ -20,10 +23,12 @@
     "mongoose": "^7.0.3"
   },
   "devDependencies": {
+    "apidoc": "^0.54.0",
     "eslint": "^8.36.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "open-cli": "^7.2.0"
   }
 }
