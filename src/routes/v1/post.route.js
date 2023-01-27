@@ -95,7 +95,29 @@ router
    */
   .delete('/:postId', controller.deletePost);
 
-// TODO: check post's password
+/**
+ * @api {post} v1/post/check-password/:postId 비밀번호 확인
+ * @apiDescription 비밀번호 확인
+ * @apiVersion 1.0.0
+ * @apiName checkPasswordPost
+ * @apiGroup Post
+ * @apiPermission everyone
+ *
+ * @apiParam  {String}  password        비밀번호
+ *
+ * @apiSuccess {String}  postId         게시글 번호
+ * @apiSuccess {String}  ip             작성자 IP
+ * @apiSuccess {String}  author         작성자
+ * @apiSuccess {String}  title          제목
+ * @apiSuccess {String}  contents       내용
+ * @apiSuccess {Boolean}  deleted       삭제 여부
+ * @apiSuccess {Date}  createdAt        생성일
+ * @apiSuccess {Date}  updatedAt        수정일
+ *
+ * @apiError (Bad Request 400)  Required fields are missing
+ */
+router.post('/check-password/:postId', controller.checkPasswordPost);
+
 // TODO: get posts
 
 module.exports = router;

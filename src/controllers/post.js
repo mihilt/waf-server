@@ -38,17 +38,16 @@ exports.postPost = async (req, res, next) => {
   }
 };
 
-// TODO: need to put new password
 exports.patchPost = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const { author, title, contents, password } = req.body;
+    const { author, title, contents, password, newPassword } = req.body;
 
-    checkRequiredFields({ author, password, title, contents });
+    checkRequiredFields({ author, password, title, contents, newPassword });
 
     const post = await Post.findOneAndUpdate(
       { postId, password },
-      { author, title, contents, password },
+      { author, title, contents, password: newPassword },
       { new: true },
     );
 
@@ -84,6 +83,22 @@ exports.deletePost = async (req, res, next) => {
     }
 
     res.status(200).json({ message: 'Post deleted' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.checkPasswordPost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const { password } = req.body;
+
+    checkRequiredFields({ password });
+
+    const post = await Post.findOne({ postId, password, deleted: false });
+
+    const { _id, ...result } = post.toObject();
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }
