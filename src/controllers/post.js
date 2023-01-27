@@ -21,7 +21,7 @@ exports.postPost = async (req, res, next) => {
   try {
     const { author, title, contents, password } = req.body;
 
-    checkRequiredFields([author, password, title, contents]);
+    checkRequiredFields({ author, password, title, contents });
 
     const post = await Post.create({
       author,
@@ -38,15 +38,16 @@ exports.postPost = async (req, res, next) => {
   }
 };
 
+// TODO: need to put new password
 exports.patchPost = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { author, title, contents, password } = req.body;
 
-    checkRequiredFields([author, password, title, contents]);
+    checkRequiredFields({ author, password, title, contents });
 
     const post = await Post.findOneAndUpdate(
-      { postId, author, password },
+      { postId, password },
       { author, title, contents, password },
       { new: true },
     );
@@ -58,6 +59,31 @@ exports.patchPost = async (req, res, next) => {
     }
     const { _id, ...result } = post.toObject();
     res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deletePost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const { password } = req.body;
+
+    checkRequiredFields({ password });
+
+    const post = await Post.findOneAndUpdate(
+      { postId, password, deleted: false },
+      { deleted: true },
+      { new: true },
+    );
+
+    if (!post) {
+      const err = new Error('Post not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    res.status(200).json({ message: 'Post deleted' });
   } catch (err) {
     next(err);
   }

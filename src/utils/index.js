@@ -9,9 +9,17 @@ exports.getNextSequence = async name => {
   return ret.seq;
 };
 
-exports.checkRequiredFields = arr => {
-  if (arr.some(field => !field)) {
-    const err = new Error('Missing required fields');
+exports.checkRequiredFields = obj => {
+  const undefinedFields = [];
+
+  Object.keys(obj).forEach(key => {
+    if (obj[key] === undefined) {
+      undefinedFields.push(key);
+    }
+  });
+
+  if (undefinedFields.length > 0) {
+    const err = new Error(`Required fields are missing: ${undefinedFields.join(', ')}`);
     err.statusCode = 400;
     throw err;
   }

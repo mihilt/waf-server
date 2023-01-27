@@ -10,6 +10,7 @@ const router = express.Router();
  * @apiVersion 1.0.0
  * @apiName postPost
  * @apiGroup Post
+ * @apiPermission everyone
  *
  * @apiParam  {String}  author          작성자
  * @apiParam  {String}  password        비밀번호
@@ -57,7 +58,7 @@ router
    * @apiVersion 1.0.0
    * @apiName patchPost
    * @apiGroup Post
-   * @apiPermission user
+   * @apiPermission everyone
    *
    * @apiParam  {String}  author          작성자
    * @apiParam  {String}  password        비밀번호
@@ -77,6 +78,24 @@ router
    * @apiError (Not Found 404)  Post not found
    *
    */
-  .patch('/:postId', controller.patchPost);
+  .patch('/:postId', controller.patchPost)
+  /**
+   * @api {delete} v1/post/:postId 게시글 삭제
+   * @apiDescription 게시글 삭제
+   * @apiVersion 1.0.0
+   * @apiName deletePost
+   * @apiGroup Post
+   * @apiPermission everyone
+   *
+   * @apiParam  {String}  password        비밀번호
+   *
+   *
+   * @apiError (Not Found 404)  Post not found
+   * @apiError (Bad Request 400)  Required fields are missing
+   */
+  .delete('/:postId', controller.deletePost);
+
+// TODO: check post's password
+// TODO: get posts
 
 module.exports = router;
