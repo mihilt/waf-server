@@ -37,3 +37,28 @@ exports.postPost = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.patchPost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+    const { author, title, contents, password } = req.body;
+
+    checkRequiredFields([author, password, title, contents]);
+
+    const post = await Post.findOneAndUpdate(
+      { postId, author, password },
+      { author, title, contents, password },
+      { new: true },
+    );
+
+    if (!post) {
+      const err = new Error('Post not found');
+      err.statusCode = 404;
+      throw err;
+    }
+    const { _id, ...result } = post.toObject();
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};

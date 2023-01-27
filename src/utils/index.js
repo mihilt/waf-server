@@ -1,6 +1,6 @@
 const Counter = require('../models/counter');
 
-const getNextSequence = async name => {
+exports.getNextSequence = async name => {
   const ret = await Counter.findOneAndUpdate(
     { _id: name },
     { $inc: { seq: 1 } },
@@ -9,15 +9,10 @@ const getNextSequence = async name => {
   return ret.seq;
 };
 
-const checkRequiredFields = arr => {
+exports.checkRequiredFields = arr => {
   if (arr.some(field => !field)) {
     const err = new Error('Missing required fields');
     err.statusCode = 400;
     throw err;
   }
-};
-
-module.exports = {
-  getNextSequence,
-  checkRequiredFields,
 };
