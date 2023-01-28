@@ -44,27 +44,34 @@ exports.getPost = async (req, res, next) => {
       err.statusCode = 400;
       throw err;
     }
-    const { _id, password, deleted, ...postResult } = post.toObject();
+    const { _id, password, deleted, ip, ...postResult } = post.toObject();
+
+    postResult.ip = ip.split('.').slice(0, 2).join('.');
 
     const comments = await Comment.find({ postId: post.postId }).select('-password -postId');
 
-    const commentsWithReplies = comments.reduce((pre, cur) => {
-      if (cur.deleted) {
-        // eslint-disable-next-line no-param-reassign
-        cur.contents = '[삭제된 댓글입니다.]';
-      }
+    const commentsWithReplies = comments
+      .map(e => {
+        e.ip = e.ip.split('.').slice(0, 2).join('.');
+        return e;
+      })
+      .reduce((pre, cur) => {
+        if (cur.deleted) {
+          // eslint-disable-next-line no-param-reassign
+          cur.contents = '[삭제된 댓글입니다.]';
+        }
 
-      if (cur.parentComment) {
-        const parentComment = pre.find(e => e.commentId === cur.parentComment);
-        parentComment.comments = parentComment.comments || [];
-        parentComment.comments.push(cur);
-      } else {
-        pre.push({
-          ...cur.toObject(),
-        });
-      }
-      return pre;
-    }, []);
+        if (cur.parentComment) {
+          const parentComment = pre.find(e => e.commentId === cur.parentComment);
+          parentComment.comments = parentComment.comments || [];
+          parentComment.comments.push(cur);
+        } else {
+          pre.push({
+            ...cur.toObject(),
+          });
+        }
+        return pre;
+      }, []);
 
     const topLevelComments = commentsWithReplies.filter(comment => !comment.parentComment);
     postResult.comments = topLevelComments;
@@ -98,7 +105,7 @@ exports.postPost = async (req, res, next) => {
 
     const { _id, ip, ...result } = post.toObject();
 
-    result.ip = refinedIp;
+    result.ip = refinedIp.split('.').slice(0, 2).join('.');
 
     res.status(201).json(result);
   } catch (err) {
@@ -127,7 +134,7 @@ exports.patchPost = async (req, res, next) => {
 
     const { _id, ip, ...result } = post.toObject();
 
-    result.ip = ip.replace(/^.*:/, '');
+    result.ip = ip.split('.').slice(0, 2).join('.');
 
     res.status(200).json(result);
   } catch (err) {
@@ -177,7 +184,7 @@ exports.checkPasswordPost = async (req, res, next) => {
 
     const { _id, ip, ...result } = post.toObject();
 
-    result.ip = ip.replace(/^.*:/, '');
+    result.ip = ip.split('.').slice(0, 2).join('.');
 
     res.status(200).json(result);
   } catch (err) {
