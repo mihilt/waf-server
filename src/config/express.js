@@ -18,6 +18,7 @@ app.use(cors());
 
 app.use('/v1', routes);
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // eslint-disable-next-line no-console
   console.error(err);

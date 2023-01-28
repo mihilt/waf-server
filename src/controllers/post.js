@@ -1,5 +1,6 @@
 const { checkRequiredFields, getNextSequence } = require('../utils');
 const Post = require('../models/post');
+const Comment = require('../models/comment');
 
 exports.getPosts = async (req, res, next) => {
   try {
@@ -8,11 +9,18 @@ exports.getPosts = async (req, res, next) => {
       .sort({ postId: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const count = await Post.countDocuments({ deleted: false });
+    const postIds = posts.map(post => post.postId);
+    const commentCounts = await Comment.aggregate([
+      { $match: { postId: { $in: postIds } } },
+      { $group: { _id: '$postId', count: { $sum: 1 } } },
+    ]);
+    const commentCountsMap = new Map(commentCounts.map(item => [item._id, item.count]));
     const result = posts.map(post => {
       const { _id, password, contents, deleted, ...rest } = post.toObject();
-      return rest;
+      const commentCount = commentCountsMap.get(post.postId) || 0;
+      return { ...rest, commentCount };
     });
+    const count = await Post.countDocuments({ deleted: false });
     res.status(200).json({ result, count });
   } catch (err) {
     next(err);
@@ -29,6 +37,25 @@ exports.getPost = async (req, res, next) => {
       throw err;
     }
     const { _id, password, ...result } = post.toObject();
+
+    const comments = await Comment.find({ postId: post.postId }).select('-password -postId');
+
+    const commentsWithReplies = comments.reduce((acc, comment) => {
+      if (comment.parentComment) {
+        const parentComment = acc.find(c => c.commentId === comment.parentComment);
+        parentComment.comments = parentComment.comments || [];
+        parentComment.comments.push(comment);
+      } else {
+        acc.push({
+          ...comment.toObject(),
+        });
+      }
+      return acc;
+    }, []);
+
+    const topLevelComments = commentsWithReplies.filter(comment => !comment.parentComment);
+    result.comments = topLevelComments;
+
     res.status(200).json(result);
   } catch (err) {
     next(err);

@@ -7,7 +7,6 @@ const commentSchema = new Schema(
     commentId: {
       type: Number,
       required: true,
-      unique: true,
     },
     postId: {
       type: Number,

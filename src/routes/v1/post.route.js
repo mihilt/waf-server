@@ -141,6 +141,4 @@ router
  */
 router.post('/check-password/:postId', controller.checkPasswordPost);
 
-// TODO: get posts
-
 module.exports = router;
