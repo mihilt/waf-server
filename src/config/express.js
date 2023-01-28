@@ -16,6 +16,8 @@ app.use(methodOverride());
 app.use(helmet());
 app.use(cors());
 
+// TODO: 너무 잦은 요청에 대한 처리(express-rate-limit), 도배 방지도 생각해보기
+
 app.use('/v1', routes);
 
 // eslint-disable-next-line no-unused-vars

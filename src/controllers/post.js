@@ -4,11 +4,20 @@ const Comment = require('../models/comment');
 
 exports.getPosts = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const posts = await Post.find({ deleted: false })
+    const { category, page = 1, limit = 10 } = req.query;
+
+    const query = {
+      deleted: false,
+      ...(category && { category }),
+    };
+
+    const count = await Post.countDocuments(query);
+
+    const posts = await Post.find(query)
       .sort({ postId: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
+
     const postIds = posts.map(post => post.postId);
     const commentCounts = await Comment.aggregate([
       { $match: { postId: { $in: postIds } } },
@@ -20,8 +29,7 @@ exports.getPosts = async (req, res, next) => {
       const commentCount = commentCountsMap.get(post.postId) || 0;
       return { ...rest, commentCount };
     });
-    const count = await Post.countDocuments({ deleted: false });
-    res.status(200).json({ result, count });
+    res.status(200).json({ count, result });
   } catch (err) {
     next(err);
   }
@@ -69,17 +77,21 @@ exports.getPost = async (req, res, next) => {
 
 exports.postPost = async (req, res, next) => {
   try {
-    const { author, title, contents, password } = req.body;
+    const { category, author, title, contents, password } = req.body;
 
-    checkRequiredFields({ author, password, title, contents });
+    checkRequiredFields({ category, author, password, title, contents });
+
+    // TODO: category 체크, 권한 체크 (유저 추가, 권한 관련 추가, category CRUD 후)
 
     const post = await Post.create({
+      category,
       author,
       password,
       title,
       contents,
       ip: req.ip,
       postId: await getNextSequence('postId'),
+      number: await getNextSequence(`category:${category}`),
     });
     const { _id, ...result } = post.toObject();
     res.status(201).json(result);

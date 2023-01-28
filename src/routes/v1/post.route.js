@@ -12,11 +12,13 @@ const router = express.Router();
  * @apiGroup Post
  * @apiPermission everyone
  *
+ * @apiParam  {String}  category         카테고리
  * @apiParam  {Number}  page              페이지 번호
  * @apiParam  {Number}  limit             페이지당 게시글 수
  *
  * @apiSuccess {Object[]}  result         게시글 목록
  * @apiSuccess {String}  result.postId    게시글 번호
+ * @apiSuccess {String}  result.category  카테고리
  * @apiSuccess {String}  result.ip        작성자 IP
  * @apiSuccess {String}  result.author    작성자
  * @apiSuccess {String}  result.title     제목
@@ -36,12 +38,14 @@ router.get('/', controller.getPosts);
  * @apiGroup Post
  * @apiPermission everyone
  *
+ * @apiParam  {String}  category        카테고리
  * @apiParam  {String}  author          작성자
  * @apiParam  {String}  password        비밀번호
  * @apiParam  {String}  title           제목
  * @apiParam  {String}  contents        내용
  *
  * @apiSuccess {String}  postId         게시글 번호
+ * @apiSuccess {String}  category       카테고리
  * @apiSuccess {String}  ip             작성자 IP
  * @apiSuccess {String}  author         작성자
  * @apiSuccess {String}  title          제목
@@ -65,6 +69,7 @@ router
    * @apiParam  {String}  postId          게시글 번호
    *
    * @apiSuccess {String}  postId         게시글 번호
+   * @apiSuccess {String}  category       카테고리
    * @apiSuccess {String}  ip             작성자 IP
    * @apiSuccess {String}  author         작성자
    * @apiSuccess {String}  title          제목
