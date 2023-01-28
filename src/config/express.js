@@ -16,7 +16,7 @@ app.use(methodOverride());
 app.use(helmet());
 app.use(cors());
 
-// TODO: 너무 잦은 요청에 대한 처리(express-rate-limit), 도배 방지도 생각해보기
+// TODO: 너무 잦은 요청에 대한 처리(express-rate-limit), 도배 방지도 생각해보기 (브라우저 스토리지, req header 말고 냅다 http 쏘는 것도 생각)
 
 app.use('/v1', routes);
 

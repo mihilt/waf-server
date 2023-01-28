@@ -41,7 +41,7 @@ exports.getPost = async (req, res, next) => {
     const post = await Post.findOne({ postId, deleted: false });
     if (!post) {
       const err = new Error('Post not found');
-      err.statusCode = 404;
+      err.statusCode = 400;
       throw err;
     }
     const { _id, password, deleted, ...postResult } = post.toObject();
@@ -83,17 +83,23 @@ exports.postPost = async (req, res, next) => {
 
     // TODO: category 체크, 권한 체크 (유저 추가, 권한 관련 추가, category CRUD 후)
 
+    const refinedIp = req.ip.replace(/^.*:/, '');
+
     const post = await Post.create({
       category,
       author,
       password,
       title,
       contents,
-      ip: req.ip,
+      ip: refinedIp,
       postId: await getNextSequence('postId'),
       number: await getNextSequence(`category:${category}`),
     });
-    const { _id, ...result } = post.toObject();
+
+    const { _id, ip, ...result } = post.toObject();
+
+    result.ip = refinedIp;
+
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -115,10 +121,14 @@ exports.patchPost = async (req, res, next) => {
 
     if (!post) {
       const err = new Error('Post not found');
-      err.statusCode = 404;
+      err.statusCode = 400;
       throw err;
     }
-    const { _id, ...result } = post.toObject();
+
+    const { _id, ip, ...result } = post.toObject();
+
+    result.ip = ip.replace(/^.*:/, '');
+
     res.status(200).json(result);
   } catch (err) {
     next(err);
@@ -140,7 +150,7 @@ exports.deletePost = async (req, res, next) => {
 
     if (!post) {
       const err = new Error('Post not found');
-      err.statusCode = 404;
+      err.statusCode = 400;
       throw err;
     }
 
@@ -159,7 +169,16 @@ exports.checkPasswordPost = async (req, res, next) => {
 
     const post = await Post.findOne({ postId, password, deleted: false });
 
-    const { _id, ...result } = post.toObject();
+    if (!post) {
+      const err = new Error('Post not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const { _id, ip, ...result } = post.toObject();
+
+    result.ip = ip.replace(/^.*:/, '');
+
     res.status(200).json(result);
   } catch (err) {
     next(err);

@@ -34,12 +34,14 @@ exports.postComment = async (req, res, next) => {
       author,
       contents,
       password: commentPassword,
-      ip: req.ip,
+      ip: req.ip.replace(/^.*:/, ''),
       commentId: (await Comment.countDocuments({ postId })) + 1,
       parentComment,
     });
 
-    const { _id, password, ...result } = comment.toObject();
+    // TODO: 프론트에서 굳이 응답에 comment 내용을 받을 필요가 있는지 구현 후 확인 필요
+    const { _id, password, ip, ...result } = comment.toObject();
+
     res.status(201).json(result);
   } catch (err) {
     next(err);

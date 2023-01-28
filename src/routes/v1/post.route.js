@@ -143,6 +143,7 @@ router
  * @apiSuccess {Date}  updatedAt        수정일
  *
  * @apiError (Bad Request 400)  Required fields are missing
+ * @apiError (Not Found 400)  Post not found
  */
 router.post('/check-password/:postId', controller.checkPasswordPost);
 
