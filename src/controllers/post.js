@@ -36,27 +36,32 @@ exports.getPost = async (req, res, next) => {
       err.statusCode = 404;
       throw err;
     }
-    const { _id, password, ...result } = post.toObject();
+    const { _id, password, deleted, ...postResult } = post.toObject();
 
     const comments = await Comment.find({ postId: post.postId }).select('-password -postId');
 
-    const commentsWithReplies = comments.reduce((acc, comment) => {
-      if (comment.parentComment) {
-        const parentComment = acc.find(c => c.commentId === comment.parentComment);
+    const commentsWithReplies = comments.reduce((pre, cur) => {
+      if (cur.deleted) {
+        // eslint-disable-next-line no-param-reassign
+        cur.contents = '[삭제된 댓글입니다.]';
+      }
+
+      if (cur.parentComment) {
+        const parentComment = pre.find(e => e.commentId === cur.parentComment);
         parentComment.comments = parentComment.comments || [];
-        parentComment.comments.push(comment);
+        parentComment.comments.push(cur);
       } else {
-        acc.push({
-          ...comment.toObject(),
+        pre.push({
+          ...cur.toObject(),
         });
       }
-      return acc;
+      return pre;
     }, []);
 
     const topLevelComments = commentsWithReplies.filter(comment => !comment.parentComment);
-    result.comments = topLevelComments;
+    postResult.comments = topLevelComments;
 
-    res.status(200).json(result);
+    res.status(200).json(postResult);
   } catch (err) {
     next(err);
   }

@@ -31,4 +31,20 @@ const router = express.Router();
  */
 router.post('/', controller.postComment);
 
+/**
+ * @api {delete} v1/comment/:commentId 댓글 삭제
+ * @apiDescription 댓글 삭제
+ * @apiVersion 1.0.0
+ * @apiName deleteComment
+ * @apiGroup Comment
+ * @apiPermission everyone
+ *
+ * @apiParam  {String}  commentId 댓글 번호
+ * @apiParam  {String}  postId    게시글 번호
+ * @apiParam  {String}  password   비밀번호
+ *
+ * @apiErorr (Bad Request 400)  Comment not found
+ */
+router.delete('/', controller.deleteComment);
+
 module.exports = router;
