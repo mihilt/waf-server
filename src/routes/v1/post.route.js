@@ -78,7 +78,7 @@ router
    * @apiSuccess {Date}  createdAt        생성일
    * @apiSuccess {Date}  updatedAt        수정일
    *
-   * @apiError (Not Found 404)  Post not found
+   * @apiError (Not Found 400)  Post not found
    */
   .get('/:postId', controller.getPost)
   /**
@@ -103,7 +103,7 @@ router
    * @apiSuccess {Date}  updatedAt        수정일
    *
    * @apiError (Bad Request 400)  Required fields are missing
-   * @apiError (Not Found 404)  Post not found
+   * @apiError (Not Found 400)  Post not found
    *
    */
   .patch('/:postId', controller.patchPost)
@@ -118,7 +118,7 @@ router
    * @apiParam  {String}  password        비밀번호
    *
    *
-   * @apiError (Not Found 404)  Post not found
+   * @apiError (Not Found 400)  Post not found
    * @apiError (Bad Request 400)  Required fields are missing
    */
   .delete('/:postId', controller.deletePost);

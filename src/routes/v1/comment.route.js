@@ -28,6 +28,8 @@ const router = express.Router();
  * @apiSuccess {Date}  updatedAt        수정일
  *
  * @apiError (Bad Request 400)  Required fields are missing
+ * @apiError (Bad Request 400)  Post not found
+ * @apiError (Bad Request 400)  Parent comment not found
  */
 router.post('/', controller.postComment);
 

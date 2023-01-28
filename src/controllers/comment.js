@@ -1,4 +1,5 @@
 const Comment = require('../models/comment');
+const Post = require('../models/post');
 const { checkRequiredFields } = require('../utils');
 
 exports.postComment = async (req, res, next) => {
@@ -6,6 +7,27 @@ exports.postComment = async (req, res, next) => {
     const { postId, author, contents, password: commentPassword, parentComment } = req.body;
 
     checkRequiredFields({ postId, author, contents, password: commentPassword });
+
+    const postExists = await Post.exists({ postId, deleted: false });
+
+    if (!postExists) {
+      const err = new Error('Post not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (parentComment) {
+      const parentCommentExists = await Comment.exists({
+        postId,
+        commentId: parentComment,
+        deleted: false,
+      });
+      if (!parentCommentExists) {
+        const err = new Error('Parent comment not found');
+        err.statusCode = 400;
+        throw err;
+      }
+    }
 
     const comment = await Comment.create({
       postId,
@@ -38,7 +60,7 @@ exports.deleteComment = async (req, res, next) => {
 
     if (!comment) {
       const err = new Error('Comment not found');
-      err.statusCode = 404;
+      err.statusCode = 400;
       throw err;
     }
 
