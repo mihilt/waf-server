@@ -11,6 +11,13 @@ const app = express();
 
 // TODO: 로거 미들웨어 추가 필요
 
+// show request in terminal temporarily
+app.use((req, res, next) => {
+  // eslint-disable-next-line no-console
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 app.use(bodyParser.json());
 
 app.use(compression());

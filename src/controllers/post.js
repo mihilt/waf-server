@@ -4,12 +4,22 @@ const Comment = require('../models/comment');
 
 exports.getPosts = async (req, res, next) => {
   try {
-    const { category, page = 1, limit = 10, like } = req.query;
+    const { category, page = 1, limit = 20, like, searchType, searchValue } = req.query;
 
     const query = {
       deleted: false,
       ...(category && { category }),
       ...(like && { like: { $gte: like } }),
+      ...(searchType &&
+        searchValue &&
+        (searchType === 'title contents'
+          ? {
+              $or: [
+                { title: { $regex: searchValue, $options: 'i' } },
+                { contents: { $regex: searchValue, $options: 'i' } },
+              ],
+            }
+          : { [searchType]: { $regex: searchValue, $options: 'i' } })),
     };
 
     const count = await Post.countDocuments(query);
