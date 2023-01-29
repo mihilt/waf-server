@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "dev": "nodemon .",
+    "start:dev": "nodemon .",
     "docker:start": "node .",
     "docs": "apidoc -i src -o docs",
     "postdocs": "open-cli docs/index.html"

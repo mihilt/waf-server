@@ -42,7 +42,11 @@ exports.getPosts = async (req, res, next) => {
 exports.getPost = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const post = await Post.findOne({ postId, deleted: false });
+    const post = await Post.findOneAndUpdate(
+      { postId, deleted: false },
+      { $inc: { view: 1 } },
+      { new: true },
+    );
     if (!post) {
       const err = new Error('Post not found');
       err.statusCode = 400;
@@ -196,6 +200,46 @@ exports.checkPasswordPost = async (req, res, next) => {
     result.ip = ip.split('.').slice(0, 2).join('.');
 
     res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * TODO: like, dislike 서버단 조작 방지 필요
+ *
+ */
+exports.likePost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findOneAndUpdate({ postId }, { $inc: { like: 1 } });
+
+    if (!post) {
+      const err = new Error('Post not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    res.status(200).json({ message: 'Post liked' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.dislikePost = async (req, res, next) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findOneAndUpdate({ postId }, { $inc: { like: -1 } });
+
+    if (!post) {
+      const err = new Error('Post not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    res.status(200).json({ message: 'Post disliked' });
   } catch (err) {
     next(err);
   }

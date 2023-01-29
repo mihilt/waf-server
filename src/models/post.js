@@ -37,6 +37,14 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
+    view: {
+      type: Number,
+      default: 0,
+    },
+    like: {
+      type: Number,
+      default: 0,
+    },
     deleted: {
       type: Boolean,
       default: false,

@@ -161,4 +161,8 @@ router
  */
 router.post('/check-password/:postId', controller.checkPasswordPost);
 
+router.post('/like/:postId', controller.likePost);
+
+router.post('/dislike/:postId', controller.dislikePost);
+
 module.exports = router;
