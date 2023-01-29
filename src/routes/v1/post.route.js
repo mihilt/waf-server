@@ -142,6 +142,7 @@ router
  * @apiGroup Post
  * @apiPermission everyone
  *
+ * @apiParam  {String}  postId          게시글 번호
  * @apiParam  {String}  password        비밀번호
  *
  * @apiSuccess {String}  postId         게시글 번호
@@ -159,10 +160,10 @@ router
  * @apiError (Bad Request 400)  Required fields are missing
  * @apiError (Not Found 400)  Post not found
  */
-router.post('/check-password/:postId', controller.checkPasswordPost);
+router.post('/check-password', controller.checkPasswordPost);
 
-router.post('/like/:postId', controller.likePost);
+router.post('/like', controller.likePost);
 
-router.post('/dislike/:postId', controller.dislikePost);
+router.post('/dislike', controller.dislikePost);
 
 module.exports = router;

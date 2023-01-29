@@ -4,11 +4,12 @@ const Comment = require('../models/comment');
 
 exports.getPosts = async (req, res, next) => {
   try {
-    const { category, page = 1, limit = 10 } = req.query;
+    const { category, page = 1, limit = 10, like } = req.query;
 
     const query = {
       deleted: false,
       ...(category && { category }),
+      ...(like && { like: { $gte: like } }),
     };
 
     const count = await Post.countDocuments(query);
@@ -45,7 +46,7 @@ exports.getPost = async (req, res, next) => {
     const post = await Post.findOneAndUpdate(
       { postId, deleted: false },
       { $inc: { view: 1 } },
-      { new: true },
+      { new: true, timestamps: false },
     );
     if (!post) {
       const err = new Error('Post not found');
@@ -180,10 +181,9 @@ exports.deletePost = async (req, res, next) => {
 
 exports.checkPasswordPost = async (req, res, next) => {
   try {
-    const { postId } = req.params;
-    const { password } = req.body;
+    const { postId, password } = req.body;
 
-    checkRequiredFields({ password });
+    checkRequiredFields({ postId, password });
 
     const post = await Post.findOne({ postId, password, deleted: false });
 
@@ -211,9 +211,15 @@ exports.checkPasswordPost = async (req, res, next) => {
  */
 exports.likePost = async (req, res, next) => {
   try {
-    const { postId } = req.params;
+    const { postId } = req.body;
 
-    const post = await Post.findOneAndUpdate({ postId }, { $inc: { like: 1 } });
+    checkRequiredFields({ postId });
+
+    const post = await Post.findOneAndUpdate(
+      { postId },
+      { $inc: { like: 1 } },
+      { new: true, timestamps: false },
+    );
 
     if (!post) {
       const err = new Error('Post not found');
@@ -229,9 +235,15 @@ exports.likePost = async (req, res, next) => {
 
 exports.dislikePost = async (req, res, next) => {
   try {
-    const { postId } = req.params;
+    const { postId } = req.body;
 
-    const post = await Post.findOneAndUpdate({ postId }, { $inc: { like: -1 } });
+    checkRequiredFields({ postId });
+
+    const post = await Post.findOneAndUpdate(
+      { postId },
+      { $inc: { like: -1 } },
+      { new: true, timestamps: false },
+    );
 
     if (!post) {
       const err = new Error('Post not found');

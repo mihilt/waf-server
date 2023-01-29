@@ -49,4 +49,8 @@ router.post('/', controller.postComment);
  */
 router.delete('/', controller.deleteComment);
 
+router.post('/like', controller.likeComment);
+
+router.post('/dislike', controller.dislikeComment);
+
 module.exports = router;

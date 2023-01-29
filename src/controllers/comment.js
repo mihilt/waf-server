@@ -52,7 +52,7 @@ exports.deleteComment = async (req, res, next) => {
   try {
     const { postId, commentId, password } = req.body;
 
-    checkRequiredFields({ password });
+    checkRequiredFields({ postId, commentId, password });
 
     const comment = await Comment.findOneAndUpdate(
       { postId, commentId, password },
@@ -67,6 +67,54 @@ exports.deleteComment = async (req, res, next) => {
     }
 
     res.status(200).json({ message: 'Comment deleted' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.likeComment = async (req, res, next) => {
+  try {
+    const { postId, commentId } = req.body;
+
+    checkRequiredFields({ postId, commentId });
+
+    const comment = await Comment.findOneAndUpdate(
+      { postId, commentId },
+      { $inc: { like: 1 } },
+      { new: true, timestamps: false },
+    );
+
+    if (!comment) {
+      const err = new Error('Comment not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    res.status(200).json({ message: 'Comment liked' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.dislikeComment = async (req, res, next) => {
+  try {
+    const { postId, commentId } = req.body;
+
+    checkRequiredFields({ postId, commentId });
+
+    const comment = await Comment.findOneAndUpdate(
+      { postId, commentId },
+      { $inc: { like: -1 } },
+      { new: true, timestamps: false },
+    );
+
+    if (!comment) {
+      const err = new Error('Comment not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    res.status(200).json({ message: 'Comment disliked' });
   } catch (err) {
     next(err);
   }
