@@ -12,19 +12,21 @@ const router = express.Router();
  * @apiGroup Post
  * @apiPermission everyone
  *
- * @apiParam  {String}  category         카테고리
- * @apiParam  {Number}  page              페이지 번호
- * @apiParam  {Number}  limit             페이지당 게시글 수
+ * @apiParam  {String}  category             카테고리
+ * @apiParam  {Number}  page                 페이지 번호
+ * @apiParam  {Number}  limit                페이지당 게시글 수
  *
- * @apiSuccess {Object[]}  result         게시글 목록
- * @apiSuccess {String}  result.postId    게시글 번호
- * @apiSuccess {String}  result.category  카테고리
- * @apiSuccess {String}  result.ip        작성자 IP
- * @apiSuccess {String}  result.author    작성자
- * @apiSuccess {String}  result.title     제목
- * @apiSuccess {Date}  result.createdAt   생성일
- * @apiSuccess {Date}  result.updatedAt   수정일
- * @apiSuccess {Number}  count            전체 게시글 수
+ * @apiSuccess {Number}  count               전체 게시글 수
+ * @apiSuccess {Object[]}  result            게시글 목록
+ * @apiSuccess {String}  result.postId       게시글 번호
+ * @apiSuccess {String}  result.categoryId   카테고리 번호
+ * @apiSuccess {String}  result.category     카테고리
+ * @apiSuccess {String}  result.ip           작성자 IP
+ * @apiSuccess {String}  result.author       작성자
+ * @apiSuccess {String}  result.title        제목
+ * @apiSuccess {Date}  result.createdAt      생성일
+ * @apiSuccess {Date}  result.updatedAt      수정일
+ * @apiSuccess {Number}  result.commentCount     댓글 수
  *
  * @apiError (Bad Request 400)  Invalid page or limit
  */
@@ -38,21 +40,30 @@ router.get('/', controller.getPosts);
  * @apiGroup Post
  * @apiPermission everyone
  *
- * @apiParam  {String}  category        카테고리
- * @apiParam  {String}  author          작성자
- * @apiParam  {String}  password        비밀번호
- * @apiParam  {String}  title           제목
- * @apiParam  {String}  contents        내용
+ * @apiParam  {String}  category                 카테고리
+ * @apiParam  {String}  author                   작성자
+ * @apiParam  {String}  password                 비밀번호
+ * @apiParam  {String}  title                    제목
+ * @apiParam  {String}  contents                 내용
  *
- * @apiSuccess {String}  postId         게시글 번호
- * @apiSuccess {String}  category       카테고리
- * @apiSuccess {String}  ip             작성자 IP
- * @apiSuccess {String}  author         작성자
- * @apiSuccess {String}  title          제목
- * @apiSuccess {String}  contents       내용
- * @apiSuccess {Boolean}  deleted       삭제 여부
- * @apiSuccess {Date}  createdAt        생성일
- * @apiSuccess {Date}  updatedAt        수정일
+ * @apiSuccess {String}  postId                  게시글 번호
+ * @apiSuccess {String}  categoryId              카테고리 번호
+ * @apiSuccess {String}  category                카테고리
+ * @apiSuccess {String}  author                  작성자
+ * @apiSuccess {String}  title                   제목
+ * @apiSuccess {String}  contents                내용
+ * @apiSuccess {Boolean}  deleted                삭제 여부
+ * @apiSuccess {Date}  createdAt                 생성일
+ * @apiSuccess {Date}  updatedAt                 수정일
+ * @apiSuccess {String}  ip                      작성자 IP
+ * @apiSuccess {Object[]}  comments              댓글 목록
+ * @apiSuccess {String}  comments.commentId      댓글 번호
+ * @apiSuccess {String}  comments.ip             작성자 IP
+ * @apiSuccess {String}  comments.author         작성자
+ * @apiSuccess {String}  comments.contents       내용
+ * @apiSuccess {Boolean}  comments.deleted       삭제 여부
+ * @apiSuccess {Date}  comments.createdAt        생성일
+ * @apiSuccess {Date}  comments.updatedAt        수정일
  *
  * @apiError (Bad Request 400)  Required fields are missing
  */
@@ -134,13 +145,16 @@ router
  * @apiParam  {String}  password        비밀번호
  *
  * @apiSuccess {String}  postId         게시글 번호
- * @apiSuccess {String}  ip             작성자 IP
+ * @apiSuccess {String}  categoryId     카테고리 번호
+ * @apiSuccess {String}  category       카테고리
  * @apiSuccess {String}  author         작성자
+ * @apiSuccess {String}  password       비밀번호 (수정 요청시 필요)
  * @apiSuccess {String}  title          제목
  * @apiSuccess {String}  contents       내용
  * @apiSuccess {Boolean}  deleted       삭제 여부
  * @apiSuccess {Date}  createdAt        생성일
  * @apiSuccess {Date}  updatedAt        수정일
+ * @apiSuccess {String}  ip             작성자 IP
  *
  * @apiError (Bad Request 400)  Required fields are missing
  * @apiError (Not Found 400)  Post not found

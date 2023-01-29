@@ -9,12 +9,12 @@ const postSchema = new Schema(
       required: true,
       unique: true,
     },
-    category: {
-      type: String,
+    categoryId: {
+      type: Number,
       required: true,
     },
-    number: {
-      type: Number,
+    category: {
+      type: String,
       required: true,
     },
     ip: {

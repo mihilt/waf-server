@@ -25,8 +25,12 @@ exports.getPosts = async (req, res, next) => {
     ]);
     const commentCountsMap = new Map(commentCounts.map(item => [item._id, item.count]));
     const result = posts.map(post => {
-      const { _id, password, contents, deleted, ...rest } = post.toObject();
+      const { _id, password, contents, deleted, ip, ...rest } = post.toObject();
+
+      rest.ip = ip.split('.').slice(0, 2).join('.');
+
       const commentCount = commentCountsMap.get(post.postId) || 0;
+
       return { ...rest, commentCount };
     });
     res.status(200).json({ count, result });
@@ -44,11 +48,11 @@ exports.getPost = async (req, res, next) => {
       err.statusCode = 400;
       throw err;
     }
-    const { _id, password, deleted, ip, ...postResult } = post.toObject();
+    const { _id, password, ip, ...postResult } = post.toObject();
 
     postResult.ip = ip.split('.').slice(0, 2).join('.');
 
-    const comments = await Comment.find({ postId: post.postId }).select('-password -postId');
+    const comments = await Comment.find({ postId: post.postId }).select('-password -postId -_id');
 
     const commentsWithReplies = comments
       .map(e => {
@@ -56,18 +60,21 @@ exports.getPost = async (req, res, next) => {
         return e;
       })
       .reduce((pre, cur) => {
-        if (cur.deleted) {
-          // eslint-disable-next-line no-param-reassign
-          cur.contents = '[삭제된 댓글입니다.]';
+        // to avoid eslintno-param-reassign :0
+        const currentComment = cur.toObject();
+
+        if (currentComment.deleted) {
+          currentComment.contents = '[삭제된 댓글입니다.]';
         }
 
-        if (cur.parentComment) {
-          const parentComment = pre.find(e => e.commentId === cur.parentComment);
+        if (currentComment.parentComment) {
+          const parentComment = pre.find(e => e.commentId === currentComment.parentComment);
           parentComment.comments = parentComment.comments || [];
-          parentComment.comments.push(cur);
+          delete currentComment.parentComment;
+          parentComment.comments.push(currentComment);
         } else {
           pre.push({
-            ...cur.toObject(),
+            ...currentComment,
           });
         }
         return pre;
@@ -100,10 +107,10 @@ exports.postPost = async (req, res, next) => {
       contents,
       ip: refinedIp,
       postId: await getNextSequence('postId'),
-      number: await getNextSequence(`category:${category}`),
+      categoryId: await getNextSequence(`category:${category}`),
     });
 
-    const { _id, ip, ...result } = post.toObject();
+    const { _id, ip, password: postPassword, ...result } = post.toObject();
 
     result.ip = refinedIp.split('.').slice(0, 2).join('.');
 
@@ -132,7 +139,7 @@ exports.patchPost = async (req, res, next) => {
       throw err;
     }
 
-    const { _id, ip, ...result } = post.toObject();
+    const { _id, ip, password: postPassword, ...result } = post.toObject();
 
     result.ip = ip.split('.').slice(0, 2).join('.');
 
@@ -182,6 +189,8 @@ exports.checkPasswordPost = async (req, res, next) => {
       throw err;
     }
 
+    // need to res password necessary cuz it can be editing post after checking password
+    // TODO: 게시글 비밀번호 암호화 이후라면 수정할 때 어떻게 해야할지 고민해보기
     const { _id, ip, ...result } = post.toObject();
 
     result.ip = ip.split('.').slice(0, 2).join('.');
