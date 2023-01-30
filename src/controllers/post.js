@@ -78,7 +78,9 @@ exports.getPost = async (req, res, next) => {
         const currentComment = cur.toObject();
 
         if (currentComment.deleted) {
-          currentComment.contents = '[삭제된 댓글입니다.]';
+          delete currentComment.author;
+          delete currentComment.contents;
+          delete currentComment.ip;
         }
 
         if (currentComment.parentComment) {
@@ -165,8 +167,7 @@ exports.patchPost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
   try {
-    const { postId } = req.params;
-    const { password } = req.body;
+    const { postId, password } = req.query;
 
     checkRequiredFields({ password });
 

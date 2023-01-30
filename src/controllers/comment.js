@@ -50,7 +50,7 @@ exports.postComment = async (req, res, next) => {
 
 exports.deleteComment = async (req, res, next) => {
   try {
-    const { postId, commentId, password } = req.body;
+    const { postId, commentId, password } = req.query;
 
     checkRequiredFields({ postId, commentId, password });
 

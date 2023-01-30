@@ -132,7 +132,7 @@ router
    * @apiError (Not Found 400)  Post not found
    * @apiError (Bad Request 400)  Required fields are missing
    */
-  .delete('/:postId', controller.deletePost);
+  .delete('/', controller.deletePost);
 
 router.get('/:category/:categoryId', controller.getPost);
 
