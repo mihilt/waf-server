@@ -52,9 +52,8 @@ exports.getPosts = async (req, res, next) => {
 
 exports.getPost = async (req, res, next) => {
   try {
-    const { postId } = req.params;
     const post = await Post.findOneAndUpdate(
-      { postId, deleted: false },
+      { ...req.params, deleted: false },
       { $inc: { view: 1 } },
       { new: true, timestamps: false },
     );

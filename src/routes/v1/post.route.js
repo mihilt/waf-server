@@ -134,6 +134,8 @@ router
    */
   .delete('/:postId', controller.deletePost);
 
+router.get('/:category/:categoryId', controller.getPost);
+
 /**
  * @api {post} v1/post/check-password/:postId 비밀번호 확인
  * @apiDescription 비밀번호 확인
