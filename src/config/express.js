@@ -22,7 +22,11 @@ app.use(bodyParser.json());
 
 app.use(compression());
 app.use(methodOverride());
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false, // for public image's ERR_BLOCKED_BY_RESPONSE error
+  }),
+);
 app.use(cors());
 
 /**
@@ -31,6 +35,8 @@ app.use(cors());
  */
 
 app.use('/v1', routes);
+
+app.use(express.static('public'));
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {

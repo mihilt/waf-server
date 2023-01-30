@@ -55,7 +55,7 @@ exports.deleteComment = async (req, res, next) => {
     checkRequiredFields({ postId, commentId, password });
 
     const comment = await Comment.findOneAndUpdate(
-      { postId, commentId, password },
+      { postId, commentId, password, deleted: false },
       { deleted: true },
       { new: true },
     );
