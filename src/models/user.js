@@ -14,10 +14,6 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    emailVerified: {
-      type: Boolean,
-      default: false,
-    },
     password: {
       type: String,
       required: true,

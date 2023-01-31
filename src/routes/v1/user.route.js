@@ -10,4 +10,6 @@ router.post('/check-email', controller.checkEmailDuplication);
 
 router.post('/check-nickname', controller.checkNicknameDuplication);
 
+router.post('/send-verification-email', controller.sendVerificationEmail);
+
 module.exports = router;

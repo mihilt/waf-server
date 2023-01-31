@@ -1,5 +1,6 @@
+const WaitingEmail = require('../models/waiting-email');
 const User = require('../models/user');
-const { checkRequiredFields, getNextSequence } = require('../utils');
+const { checkRequiredFields, getNextSequence, generateRandomString } = require('../utils');
 
 exports.postUser = async (req, res, next) => {
   try {
@@ -72,6 +73,30 @@ exports.checkNicknameDuplication = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Nickname is available',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.sendVerificationEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    checkRequiredFields({ email });
+
+    const verificationCode = generateRandomString();
+
+    await WaitingEmail.findOneAndUpdate(
+      { email },
+      { email, verificationCode, expiredAt: Date.now() + 1000 * 60 * 60 * 24 },
+      { upsert: true },
+    );
+
+    // send email verification
+
+    res.status(200).json({
+      message: 'Email verification sent',
     });
   } catch (err) {
     next(err);
