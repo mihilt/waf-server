@@ -4,12 +4,12 @@ const router = express.Router();
 
 const postRoutes = require('./post.route');
 const commentRoutes = require('./comment.route');
-const testRoutes = require('./test.route');
+const userRoutes = require('./user.route');
 const uploadRoutes = require('./upload.route');
 
 router.use('/post', postRoutes);
 router.use('/comment', commentRoutes);
 router.use('/upload', uploadRoutes);
-router.use('/test', testRoutes);
+router.use('/user', userRoutes);
 
 module.exports = router;
