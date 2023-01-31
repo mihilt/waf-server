@@ -1,3 +1,5 @@
+const nodemailer = require('nodemailer');
+const { gmailID, gmailPassword, gmailName } = require('../config/vars');
 const Counter = require('../models/counter');
 
 exports.getNextSequence = async name => {
@@ -26,3 +28,23 @@ exports.checkRequiredFields = obj => {
 };
 
 exports.generateRandomString = () => Math.random().toString(36).substring(2);
+
+exports.sendMail = async ({ to, subject, html }) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: gmailID,
+      pass: gmailPassword,
+    },
+  });
+
+  await transporter.sendMail({
+    from: {
+      name: gmailName,
+      address: gmailID,
+    },
+    to,
+    subject,
+    html,
+  });
+};

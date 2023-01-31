@@ -1,6 +1,11 @@
 const WaitingEmail = require('../models/waiting-email');
 const User = require('../models/user');
-const { checkRequiredFields, getNextSequence, generateRandomString } = require('../utils');
+const {
+  checkRequiredFields,
+  getNextSequence,
+  generateRandomString,
+  sendMail,
+} = require('../utils');
 
 exports.postUser = async (req, res, next) => {
   try {
@@ -86,14 +91,25 @@ exports.sendVerificationEmail = async (req, res, next) => {
     checkRequiredFields({ email });
 
     const verificationCode = generateRandomString();
+    const expiredAt = Date.now() + 1000 * 60 * 60;
 
     await WaitingEmail.findOneAndUpdate(
       { email },
-      { email, verificationCode, expiredAt: Date.now() + 1000 * 60 * 60 * 24 },
+      { email, verificationCode, expiredAt },
       { upsert: true },
     );
 
-    // send email verification
+    await sendMail({
+      to: email,
+      subject: 'Email verification',
+      html: `
+      <div>
+        <p>안녕하세요.</p>
+        <br />
+        <p>인증번호: ${verificationCode}</p>
+        <p>인증 유효 기간: ${new Date(expiredAt).toLocaleString()}</p>
+      </div>`,
+    });
 
     res.status(200).json({
       message: 'Email verification sent',
