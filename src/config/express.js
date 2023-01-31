@@ -4,19 +4,34 @@ const helmet = require('helmet');
 const cors = require('cors');
 const compression = require('compression');
 const methodOverride = require('method-override');
+const morgan = require('morgan');
+const rfs = require('rotating-file-stream');
+const path = require('path');
+const moment = require('moment');
 
 const routes = require('../routes/v1');
 
 const app = express();
 
-// TODO: 로거 미들웨어 추가 필요
+morgan.token('date', () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
 
-// show request in terminal temporarily
-app.use((req, res, next) => {
-  // eslint-disable-next-line no-console
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(
+    morgan('combined', {
+      stream: rfs.createStream('access.log', {
+        interval: '1d',
+        path: path.join(
+          './logs',
+          new Date().getFullYear().toString(),
+          new Date().getMonth().toString(),
+          new Date().getDate().toString(),
+        ),
+      }),
+    }),
+  );
+}
 
 app.use(bodyParser.json());
 
