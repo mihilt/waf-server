@@ -50,10 +50,16 @@ exports.login = async (req, res, next) => {
 
     const refreshTokenExpiresAt = moment().add(jwtRefreshExpirationDays, 'days');
 
+    res.set('Authorization', `Bearer ${accessToken}`);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      expires: refreshTokenExpiresAt.toDate(),
+    });
+
     res.status(200).json({
+      message: 'Login success',
       tokenType: 'bearer',
-      accessToken,
-      refreshToken,
       accessTokenExpiresAt,
       refreshTokenExpiresAt,
     });
@@ -64,7 +70,9 @@ exports.login = async (req, res, next) => {
 
 exports.refreshToken = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
+
+    checkRequiredFields({ refreshToken });
 
     const decodedToken = jwt.verify(refreshToken, jwtSecret);
 
@@ -96,10 +104,16 @@ exports.refreshToken = async (req, res, next) => {
 
     const refreshTokenExpiresAt = moment().add(jwtRefreshExpirationDays, 'days');
 
+    res.set('Authorization', `Bearer ${accessToken}`);
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      expires: refreshTokenExpiresAt.toDate(),
+    });
+
     res.status(200).json({
+      message: 'Refresh token success',
       tokenType: 'bearer',
-      accessToken,
-      refreshToken: newRefreshToken,
       accessTokenExpiresAt,
       refreshTokenExpiresAt,
     });

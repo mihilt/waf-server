@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const rfs = require('rotating-file-stream');
 const path = require('path');
 const moment = require('moment');
+const cookieParser = require('cookie-parser');
 
 const routes = require('../routes/v1');
 
@@ -33,6 +34,7 @@ if (process.env.NODE_ENV === 'development') {
   );
 }
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(compression());
