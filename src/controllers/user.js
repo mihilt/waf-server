@@ -9,13 +9,16 @@ const {
 
 exports.postUser = async (req, res, next) => {
   try {
-    const { email, password, nickname } = req.body;
+    const { email, password, nickname, verificationCode } = req.body;
 
-    checkRequiredFields({ email, password, nickname });
+    checkRequiredFields({ email, password, nickname, verificationCode });
+
+    // TODO: email validation
 
     if (await User.findOne({ email })) {
       res.status(409).json({
         message: 'Email already exists',
+        code: 'email-already-exists',
       });
       return;
     }
@@ -23,9 +26,20 @@ exports.postUser = async (req, res, next) => {
     if (await User.findOne({ nickname })) {
       res.status(409).json({
         message: 'Nickname already exists',
+        code: 'nickname-already-exists',
       });
       return;
     }
+
+    if (!(await WaitingEmail.findOne({ email, verificationCode }))) {
+      res.status(400).json({
+        message: 'Invalid verification code',
+        code: 'invalid-verification-code',
+      });
+      return;
+    }
+
+    // TODO: password hashing -> 로그인도 비교 필요
 
     await User.create({
       userId: await getNextSequence('userId'),
@@ -113,6 +127,29 @@ exports.sendVerificationEmail = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Email verification sent',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.checkVerificationEmail = async (req, res, next) => {
+  try {
+    const { email, verificationCode } = req.body;
+
+    checkRequiredFields({ email, verificationCode });
+
+    const checkResult = await WaitingEmail.findOne({ email, verificationCode });
+
+    if (!checkResult || checkResult.expiredAt < Date.now()) {
+      res.status(400).json({
+        message: 'Invalid email or verification code',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Email verification success',
     });
   } catch (err) {
     next(err);

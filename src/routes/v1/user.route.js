@@ -12,4 +12,6 @@ router.post('/check-nickname', controller.checkNicknameDuplication);
 
 router.post('/send-verification-email', controller.sendVerificationEmail);
 
+router.post('/check-verification-email', controller.checkVerificationEmail);
+
 module.exports = router;
