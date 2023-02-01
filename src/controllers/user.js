@@ -31,7 +31,7 @@ exports.postUser = async (req, res, next) => {
       return;
     }
 
-    if (!(await WaitingEmail.findOne({ email, verificationCode }))) {
+    if (!(await WaitingEmail.findOneAndDelete({ email, verificationCode }))) {
       res.status(400).json({
         message: 'Invalid verification code',
         code: 'invalid-verification-code',
@@ -103,6 +103,15 @@ exports.sendVerificationEmail = async (req, res, next) => {
     const { email } = req.body;
 
     checkRequiredFields({ email });
+
+    const user = await User.findOne({ email });
+
+    if (user) {
+      res.status(409).json({
+        message: 'Email already used',
+        code: 'email-already-used',
+      });
+    }
 
     const verificationCode = generateRandomString();
     const expiredAt = Date.now() + 1000 * 60 * 60;
