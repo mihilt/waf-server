@@ -23,6 +23,10 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
+    auth: {
+      type: String,
+      enum: ['A'],
+    },
     deleted: {
       type: Boolean,
       default: false,
