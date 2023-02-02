@@ -4,11 +4,11 @@ const Comment = require('../models/comment');
 
 exports.getPosts = async (req, res, next) => {
   try {
-    const { category, page = 1, limit = 20, like, searchType, searchValue } = req.query;
+    const { categoryId, page = 1, limit = 20, like, searchType, searchValue } = req.query;
 
     const query = {
       deleted: false,
-      ...(category && { category }),
+      ...(categoryId && { categoryId }),
       ...(like && { like: { $gte: like } }),
       ...(searchType &&
         searchValue &&
@@ -107,23 +107,23 @@ exports.getPost = async (req, res, next) => {
 
 exports.postPost = async (req, res, next) => {
   try {
-    const { category, author, title, content, password } = req.body;
+    const { categoryId, author, title, content, password } = req.body;
 
-    checkRequiredFields({ category, author, password, title, content });
+    checkRequiredFields({ categoryId, author, password, title, content });
 
     // TODO: category 체크, 권한 체크 (유저 추가, 권한 관련 추가, category CRUD 후)
 
     const refinedIp = req.ip.replace(/^.*:/, '');
 
     const post = await Post.create({
-      category,
+      categoryId,
       author,
       password,
       title,
       content,
       ip: refinedIp,
       postId: await getNextSequence('postId'),
-      categorySeq: await getNextSequence(`category:${category}`),
+      categorySeq: await getNextSequence(`category:${categoryId}`),
     });
 
     const { _id, ip, password: postPassword, ...result } = post.toObject();

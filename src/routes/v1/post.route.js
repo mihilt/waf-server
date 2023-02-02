@@ -12,7 +12,7 @@ const router = express.Router();
  * @apiGroup Post
  * @apiPermission everyone
  *
- * @apiParam  {String}  category             카테고리
+ * @apiParam  {String}  categoryId             카테고리 아이디
  * @apiParam  {Number}  page                 페이지 번호
  * @apiParam  {Number}  limit                페이지당 게시글 수
  *
@@ -20,7 +20,7 @@ const router = express.Router();
  * @apiSuccess {Object[]}  result            게시글 목록
  * @apiSuccess {String}  result.postId       게시글 번호
  * @apiSuccess {String}  result.categorySeq   카테고리 시퀀스
- * @apiSuccess {String}  result.category     카테고리
+ * @apiSuccess {String}  result.categoryId     카테고리 아이디
  * @apiSuccess {String}  result.ip           작성자 IP
  * @apiSuccess {String}  result.author       작성자
  * @apiSuccess {String}  result.title        제목
@@ -40,7 +40,7 @@ router.get('/', controller.getPosts);
  * @apiGroup Post
  * @apiPermission everyone
  *
- * @apiParam  {String}  category                 카테고리
+ * @apiParam  {String}  categoryId                 카테고리 아이디
  * @apiParam  {String}  author                   작성자
  * @apiParam  {String}  password                 비밀번호
  * @apiParam  {String}  title                    제목
@@ -48,7 +48,7 @@ router.get('/', controller.getPosts);
  *
  * @apiSuccess {String}  postId                  게시글 번호
  * @apiSuccess {String}  categorySeq              카테고리 시퀀스
- * @apiSuccess {String}  category                카테고리
+ * @apiSuccess {String}  categoryId                카테고리 아이디
  * @apiSuccess {String}  author                  작성자
  * @apiSuccess {String}  title                   제목
  * @apiSuccess {String}  content                내용
@@ -80,7 +80,7 @@ router
    * @apiParam  {String}  postId          게시글 번호
    *
    * @apiSuccess {String}  postId         게시글 번호
-   * @apiSuccess {String}  category       카테고리
+   * @apiSuccess {String}  categoryId       카테고리 아이디
    * @apiSuccess {String}  ip             작성자 IP
    * @apiSuccess {String}  author         작성자
    * @apiSuccess {String}  title          제목
@@ -134,7 +134,7 @@ router
    */
   .delete('/', controller.deletePost);
 
-router.get('/:category/:categorySeq', controller.getPost);
+router.get('/:categoryId/:categorySeq', controller.getPost);
 
 /**
  * @api {post} v1/post/check-password/:postId 비밀번호 확인
@@ -149,7 +149,7 @@ router.get('/:category/:categorySeq', controller.getPost);
  *
  * @apiSuccess {String}  postId         게시글 번호
  * @apiSuccess {String}  categorySeq     카테고리 시퀀스
- * @apiSuccess {String}  category       카테고리
+ * @apiSuccess {String}  categoryId       카테고리 아이디
  * @apiSuccess {String}  author         작성자
  * @apiSuccess {String}  password       비밀번호 (수정 요청시 필요)
  * @apiSuccess {String}  title          제목
