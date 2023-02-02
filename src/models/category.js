@@ -4,13 +4,18 @@ const { Schema } = mongoose;
 
 const categorySchema = new Schema(
   {
+    categoryId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     name: {
       type: String,
       required: true,
     },
     auth: {
       type: String,
-      required: true,
+      enum: ['A'],
     },
   },
   {

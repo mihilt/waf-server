@@ -39,6 +39,8 @@ exports.postComment = async (req, res, next) => {
       parentCommentId,
     });
 
+    // TODO: parentCommentId의 userId와 postId의 userId에게 알림을 보내는데 알림을 보내지 않아야 할 경우를 생각하고(게시글 등록자와 postComment 요청 Authenticated User가 같을 경우 등..) 구현 필요
+
     // TODO: 프론트에서 굳이 응답에 comment 내용을 받을 필요가 있는지 구현 후 확인 필요
     const { _id, password, ip, ...result } = comment.toObject();
 
