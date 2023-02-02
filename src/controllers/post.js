@@ -12,11 +12,11 @@ exports.getPosts = async (req, res, next) => {
       ...(like && { like: { $gte: like } }),
       ...(searchType &&
         searchValue &&
-        (searchType === 'title contents'
+        (searchType === 'title content'
           ? {
               $or: [
                 { title: { $regex: searchValue, $options: 'i' } },
-                { contents: { $regex: searchValue, $options: 'i' } },
+                { content: { $regex: searchValue, $options: 'i' } },
               ],
             }
           : { [searchType]: { $regex: searchValue, $options: 'i' } })),
@@ -36,7 +36,7 @@ exports.getPosts = async (req, res, next) => {
     ]);
     const commentCountsMap = new Map(commentCounts.map(item => [item._id, item.count]));
     const result = posts.map(post => {
-      const { _id, password, contents, deleted, ip, ...rest } = post.toObject();
+      const { _id, password, content, deleted, ip, ...rest } = post.toObject();
 
       rest.ip = ip.split('.').slice(0, 2).join('.');
 
@@ -79,14 +79,14 @@ exports.getPost = async (req, res, next) => {
 
         if (currentComment.deleted) {
           delete currentComment.author;
-          delete currentComment.contents;
+          delete currentComment.content;
           delete currentComment.ip;
         }
 
-        if (currentComment.parentComment) {
-          const parentComment = pre.find(e => e.commentId === currentComment.parentComment);
+        if (currentComment.parentCommentId) {
+          const parentComment = pre.find(e => e.commentId === currentComment.parentCommentId);
           parentComment.comments = parentComment.comments || [];
-          delete currentComment.parentComment;
+          delete currentComment.parentCommentId;
           parentComment.comments.push(currentComment);
         } else {
           pre.push({
@@ -96,7 +96,7 @@ exports.getPost = async (req, res, next) => {
         return pre;
       }, []);
 
-    const topLevelComments = commentsWithReplies.filter(comment => !comment.parentComment);
+    const topLevelComments = commentsWithReplies.filter(comment => !comment.parentCommentId);
     postResult.comments = topLevelComments;
 
     res.status(200).json(postResult);
@@ -107,9 +107,9 @@ exports.getPost = async (req, res, next) => {
 
 exports.postPost = async (req, res, next) => {
   try {
-    const { category, author, title, contents, password } = req.body;
+    const { category, author, title, content, password } = req.body;
 
-    checkRequiredFields({ category, author, password, title, contents });
+    checkRequiredFields({ category, author, password, title, content });
 
     // TODO: category 체크, 권한 체크 (유저 추가, 권한 관련 추가, category CRUD 후)
 
@@ -120,10 +120,10 @@ exports.postPost = async (req, res, next) => {
       author,
       password,
       title,
-      contents,
+      content,
       ip: refinedIp,
       postId: await getNextSequence('postId'),
-      categoryId: await getNextSequence(`category:${category}`),
+      categorySeq: await getNextSequence(`category:${category}`),
     });
 
     const { _id, ip, password: postPassword, ...result } = post.toObject();
@@ -139,13 +139,13 @@ exports.postPost = async (req, res, next) => {
 exports.patchPost = async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const { author, title, contents, password, newPassword } = req.body;
+    const { author, title, content, password, newPassword } = req.body;
 
-    checkRequiredFields({ author, password, title, contents, newPassword });
+    checkRequiredFields({ author, password, title, content, newPassword });
 
     const post = await Post.findOneAndUpdate(
       { postId, password },
-      { author, title, contents, password: newPassword },
+      { author, title, content, password: newPassword },
       { new: true },
     );
 

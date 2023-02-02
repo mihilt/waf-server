@@ -15,15 +15,15 @@ const router = express.Router();
  * @apiParam  {String}  postId          게시글 번호
  * @apiParam  {String}  author          작성자
  * @apiParam  {String}  password        비밀번호
- * @apiParam  {String}  contents        내용
- * @apiParam  {String}  parentComment   부모 댓글 번호
+ * @apiParam  {String}  content        내용
+ * @apiParam  {String}  parentCommentId   부모 댓글 번호
  *
  * @apiSuccess {String}  commentId      댓글 번호
  * @apiSuccess {String}  postId         게시글 번호
  * @apiSuccess {String}  ip             작성자 IP
  * @apiSuccess {String}  author         작성자
- * @apiSuccess {String}  contents       내용
- * @apiSuccess {String}  parentComment  부모 댓글 번호
+ * @apiSuccess {String}  content       내용
+ * @apiSuccess {String}  parentCommentId  부모 댓글 번호
  * @apiSuccess {Date}  createdAt        생성일
  * @apiSuccess {Date}  updatedAt        수정일
  *

@@ -9,7 +9,7 @@ const postSchema = new Schema(
       required: true,
       unique: true,
     },
-    categoryId: {
+    categorySeq: {
       type: Number,
       required: true,
     },
@@ -39,7 +39,7 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
-    contents: {
+    content: {
       type: String,
       required: true,
     },

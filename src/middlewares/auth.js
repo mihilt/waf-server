@@ -17,18 +17,16 @@ exports.checkIsLoggedIn = async (req, res, next) => {
     const decodedToken = jwt.verify(token, jwtSecret);
     const { userId } = decodedToken;
 
-    /* TODO: DB 조회로 검증 필요할지 고민 필요
-    const user = await User.findOne({ userId });
-
-    if (!user) {
+    if (!userId) {
       res.status(401).json({
-        message: 'Invalid user',
+        message: 'Invalid token',
       });
       return;
     }
-    */
 
-    if (!userId) {
+    const user = await User.exists({ userId });
+
+    if (!user) {
       res.status(401).json({
         message: 'Invalid user',
       });

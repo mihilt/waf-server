@@ -16,7 +16,7 @@ const commentSchema = new Schema(
       type: String,
       required: true,
     },
-    parentComment: {
+    parentCommentId: {
       type: Number,
     },
     userId: {
@@ -32,7 +32,7 @@ const commentSchema = new Schema(
     password: {
       type: String,
     },
-    contents: {
+    content: {
       type: String,
       required: true,
     },

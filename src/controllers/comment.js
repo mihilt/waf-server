@@ -4,9 +4,9 @@ const { checkRequiredFields } = require('../utils');
 
 exports.postComment = async (req, res, next) => {
   try {
-    const { postId, author, contents, password: commentPassword, parentComment } = req.body;
+    const { postId, author, content, password: commentPassword, parentCommentId } = req.body;
 
-    checkRequiredFields({ postId, author, contents, password: commentPassword });
+    checkRequiredFields({ postId, author, content, password: commentPassword });
 
     const postExists = await Post.exists({ postId, deleted: false });
 
@@ -16,10 +16,10 @@ exports.postComment = async (req, res, next) => {
       throw err;
     }
 
-    if (parentComment) {
+    if (parentCommentId) {
       const parentCommentExists = await Comment.exists({
         postId,
-        commentId: parentComment,
+        commentId: parentCommentId,
         deleted: false,
       });
       if (!parentCommentExists) {
@@ -32,11 +32,11 @@ exports.postComment = async (req, res, next) => {
     const comment = await Comment.create({
       postId,
       author,
-      contents,
+      content,
       password: commentPassword,
       ip: req.ip.replace(/^.*:/, ''),
       commentId: (await Comment.countDocuments({ postId })) + 1,
-      parentComment,
+      parentCommentId,
     });
 
     // TODO: 프론트에서 굳이 응답에 comment 내용을 받을 필요가 있는지 구현 후 확인 필요
