@@ -1,31 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const { jwtSecret } = require('../config/vars');
-const { checkRequiredFields, getNextSequence } = require('../utils');
+const { checkRequiredFields } = require('../utils');
 const Notification = require('../models/notification');
-
-// TODO: 클라이언트 요청 없이 express 내부 함수로만 사용할거면 라우터에서 빼야할지 고민 필요
-exports.postNotification = async (req, res, next) => {
-  try {
-    const { userId, content, link, icon } = req.body;
-
-    checkRequiredFields({ userId, content });
-
-    // TODO: DB 검증 필요한지 고민 필요
-
-    await Notification.create({
-      notificationId: await getNextSequence('notificationId'),
-      userId,
-      content,
-      link,
-      icon,
-    });
-
-    res.status(200).json({ message: 'Notification created' });
-  } catch (err) {
-    next(err);
-  }
-};
 
 exports.getNotifications = async (req, res, next) => {
   try {

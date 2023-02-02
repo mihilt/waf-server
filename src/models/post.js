@@ -21,13 +21,19 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
+    userId: {
+      type: Number,
+    },
+    /**
+     * 인증이 완료된 client의 경우 nickName을 author에 저장한다.
+     * userId로 조인하여 가져오기보다 author을 통해 당시 사용자의 nickName을 보여주도록
+     */
     author: {
       type: String,
       required: true,
     },
     password: {
       type: String,
-      required: true,
     },
     title: {
       type: String,

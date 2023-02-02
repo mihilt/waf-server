@@ -204,7 +204,7 @@ exports.checkPasswordPost = async (req, res, next) => {
     }
 
     // need to res password necessary cuz it can be editing post after checking password
-    // TODO: 게시글 비밀번호 암호화 이후라면 수정할 때 어떻게 해야할지 고민해보기
+    // TODO: 게시글 비밀번호 암호화 이후라면 수정할 때 어떻게 해야할지 고민해보기 -> 개인정보가 아니라 해싱이 필요가 없다?
     const { _id, ip, ...result } = post.toObject();
 
     result.ip = ip.split('.').slice(0, 2).join('.');

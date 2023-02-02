@@ -19,13 +19,18 @@ const commentSchema = new Schema(
     parentComment: {
       type: Number,
     },
+    userId: {
+      type: Number,
+    },
+    /**
+     * post model의 author와 동일하게 처리 필요
+     */
     author: {
       type: String,
       required: true,
     },
     password: {
       type: String,
-      required: true,
     },
     contents: {
       type: String,
