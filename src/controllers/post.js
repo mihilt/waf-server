@@ -1,6 +1,7 @@
 const { checkRequiredFields, getNextSequence } = require('../utils');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const Category = require('../models/category');
 
 exports.getPosts = async (req, res, next) => {
   try {
@@ -24,7 +25,7 @@ exports.getPosts = async (req, res, next) => {
 
     const count = await Post.countDocuments(query);
 
-    const posts = await Post.find(query)
+    const posts = await Post.find(query) // content를 검색조건에서 사용하기에 select에서 거르지 않았다.
       .sort({ postId: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -111,7 +112,15 @@ exports.postPost = async (req, res, next) => {
 
     checkRequiredFields({ categoryId, author, password, title, content });
 
-    // TODO: category 체크, 권한 체크 (유저 추가, 권한 관련 추가, category CRUD 후)
+    const category = await Category.findOne({ categoryId });
+
+    if (!category) {
+      const err = new Error('Category not found');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // TODO: 글 등록 A 권한 체크
 
     const refinedIp = req.ip.replace(/^.*:/, '');
 

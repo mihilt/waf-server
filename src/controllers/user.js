@@ -130,7 +130,7 @@ exports.sendVerificationEmail = async (req, res, next) => {
         <p>안녕하세요.</p>
         <br />
         <p>인증번호: ${verificationCode}</p>
-        <p>인증 유효 기간: ${new Date(expiredAt).toLocaleString()}</p>
+        <p>인증 유효 기간: ${new Date(expiredAt).toLocaleString('ko-KR')}</p>
       </div>`,
     });
 

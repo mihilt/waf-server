@@ -5,6 +5,8 @@ const { checkAdminAuth } = require('../../middlewares/auth');
 
 const router = express.Router();
 
+router.get('/', controller.getCategories);
+
 router.post('/', checkAdminAuth, controller.postCategory);
 
 module.exports = router;
