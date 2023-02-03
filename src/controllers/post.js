@@ -2,6 +2,7 @@ const { checkRequiredFields, getNextSequence } = require('../utils');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Category = require('../models/category');
+const { getCategoryService } = require('../services/category');
 
 exports.getPosts = async (req, res, next) => {
   try {
@@ -25,18 +26,20 @@ exports.getPosts = async (req, res, next) => {
 
     const count = await Post.countDocuments(query);
 
-    const posts = await Post.find(query) // content를 검색조건에서 사용하기에 select에서 거르지 않았다.
+    const category = await getCategoryService({ categoryId });
+
+    const postsWithoutComments = await Post.find(query) // content를 검색조건에서 사용하기에 select에서 거르지 않았다.
       .sort({ postId: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const postIds = posts.map(post => post.postId);
+    const postIds = postsWithoutComments.map(post => post.postId);
     const commentCounts = await Comment.aggregate([
       { $match: { postId: { $in: postIds } } },
       { $group: { _id: '$postId', count: { $sum: 1 } } },
     ]);
     const commentCountsMap = new Map(commentCounts.map(item => [item._id, item.count]));
-    const result = posts.map(post => {
+    const posts = postsWithoutComments.map(post => {
       const { _id, password, content, deleted, ip, ...rest } = post.toObject();
 
       rest.ip = ip.split('.').slice(0, 2).join('.');
@@ -45,7 +48,7 @@ exports.getPosts = async (req, res, next) => {
 
       return { ...rest, commentCount };
     });
-    res.status(200).json({ count, result });
+    res.status(200).json({ count, category, posts });
   } catch (err) {
     next(err);
   }
@@ -64,6 +67,8 @@ exports.getPost = async (req, res, next) => {
       throw err;
     }
     const { _id, password, ip, ...postResult } = post.toObject();
+
+    postResult.category = await getCategoryService({ categoryId: post.categoryId });
 
     postResult.ip = ip.split('.').slice(0, 2).join('.');
 
@@ -112,7 +117,7 @@ exports.postPost = async (req, res, next) => {
 
     checkRequiredFields({ categoryId, author, password, title, content });
 
-    const category = await Category.findOne({ categoryId });
+    const category = await Category.exists({ categoryId });
 
     if (!category) {
       const err = new Error('Category not found');

@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.get('/', controller.getCategories);
 
+router.get('/:categoryId', controller.getCategory);
+
 router.post('/', checkAdminAuth, controller.postCategory);
 
 module.exports = router;

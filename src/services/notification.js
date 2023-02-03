@@ -2,14 +2,15 @@ const { getNextSequence } = require('../utils');
 const Notification = require('../models/notification');
 const User = require('../models/user');
 
-exports.postNotification = async ({ userId, content, link, icon }) => {
+// TODO: 덧글 생성 && 익명 게시글 아닐 경우 알림 생성
+exports.postNotificationService = async ({ userId, content, link, icon }) => {
   const userExist = await User.exists({ userId });
 
   if (!userExist) {
     throw new Error('User not found');
   }
 
-  const result = await Notification.create({
+  const notification = await Notification.create({
     notificationId: await getNextSequence('notificationId'),
     userId,
     content,
@@ -17,5 +18,5 @@ exports.postNotification = async ({ userId, content, link, icon }) => {
     icon,
   });
 
-  return result;
+  return notification.toObject();
 };

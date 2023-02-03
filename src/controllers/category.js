@@ -2,32 +2,35 @@ const Category = require('../models/category');
 const Post = require('../models/post');
 const { checkRequiredFields } = require('../utils');
 const Comment = require('../models/comment');
+const { getCategoryService } = require('../services/category');
 
-// TODO: isGetRecentPosts false일 때도 잘 동작하는지 확인 필요
 exports.getCategories = async (req, res, next) => {
   try {
     const isGetRecentPosts = req.query.isGetRecentPosts === 'true';
 
-    const categories = await Category.find({}, { _id: 0, createdAt: 0, updatedAt: 0 }).sort({
+    const categoriesWithoutPosts = await Category.find().select('-_id -createdAt -updatedAt').sort({
       name: 1,
     });
 
-    const result = isGetRecentPosts
+    const categories = isGetRecentPosts
       ? await Promise.all(
-          categories.map(async category => {
-            const recentPosts = await Post.find({ categoryId: category.categoryId, deleted: false })
-              .select('postId categorySeq title createdAt likes')
+          categoriesWithoutPosts.map(async category => {
+            const recentPostsWithoutCommentCount = await Post.find({
+              categoryId: category.categoryId,
+              deleted: false,
+            })
+              .select('postId categorySeq title createdAt like')
               .sort({ postId: -1 })
               .limit(5);
 
-            const postIds = recentPosts.map(post => post.postId);
+            const postIds = recentPostsWithoutCommentCount.map(post => post.postId);
             const commentCounts = await Comment.aggregate([
               { $match: { postId: { $in: postIds } } },
               { $group: { _id: '$postId', count: { $sum: 1 } } },
             ]);
             const commentCountsMap = new Map(commentCounts.map(item => [item._id, item.count]));
 
-            const postResult = recentPosts.map(post => {
+            const recentPosts = recentPostsWithoutCommentCount.map(post => {
               const { _id, postId, ...rest } = post.toObject();
               const commentCount = commentCountsMap.get(post.postId) || 0;
 
@@ -35,14 +38,28 @@ exports.getCategories = async (req, res, next) => {
             });
 
             return {
-              postResult,
+              recentPosts,
               ...category.toObject(),
             };
           }),
         )
-      : categories;
+      : categoriesWithoutPosts;
 
-    res.status(200).json({ result });
+    res.status(200).json({ categories });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getCategory = async (req, res, next) => {
+  try {
+    const { categoryId } = req.params;
+
+    checkRequiredFields({ categoryId });
+
+    const getCategoryServiceResult = await getCategoryService({ categoryId });
+
+    res.status(200).json({ category: getCategoryServiceResult });
   } catch (err) {
     next(err);
   }
