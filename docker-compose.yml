@@ -13,7 +13,7 @@ services:
       - mongodb
       - redis
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/waf-development?retryWrites=true&w=majority
+      - MONGO_URI=mongodb://${MONGO_WAF_USERNAME}:${MONGO_WAF_PASSWORD}@mongodb:27017/${MONGO_INITDB_DATABASE}?retryWrites=true&w=majority
       - REDIS_HOST=redis
     command: npm run docker:start
 
@@ -23,6 +23,10 @@ services:
       - ~/docker-data/mongodb:/data/db
     ports:
       - '27017:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
 
   redis:
     image: redis
