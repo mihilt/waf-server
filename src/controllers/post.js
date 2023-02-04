@@ -240,7 +240,7 @@ exports.likePost = async (req, res, next) => {
     const redisKey = `like:${refinedIp}:posts`;
     const sAddResult = await redisClient.sAdd(redisKey, postId.toString());
 
-    if (sAddResult === 0) {
+    if (sAddResult !== 1) {
       res.status(409).json({ message: 'Already did', code: 'already-did' });
       return;
     }
@@ -274,7 +274,7 @@ exports.dislikePost = async (req, res, next) => {
     const redisKey = `like:${refinedIp}:posts`;
     const sAddResult = await redisClient.sAdd(redisKey, postId.toString());
 
-    if (sAddResult === 0) {
+    if (sAddResult !== 1) {
       res.status(409).json({ message: 'Already did', code: 'already-did' });
       return;
     }

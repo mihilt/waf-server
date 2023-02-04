@@ -86,7 +86,7 @@ exports.likeComment = async (req, res, next) => {
     const redisValue = `${postId}:${commentId}`;
     const sAddResult = await redisClient.sAdd(redisKey, redisValue);
 
-    if (sAddResult === 0) {
+    if (sAddResult !== 1) {
       res.status(409).json({ message: 'Already did', code: 'already-did' });
       return;
     }
@@ -122,7 +122,7 @@ exports.dislikeComment = async (req, res, next) => {
     const redisValue = `${postId}:${commentId}`;
     const sAddResult = await redisClient.sAdd(redisKey, redisValue);
 
-    if (sAddResult === 0) {
+    if (sAddResult !== 1) {
       res.status(409).json({ message: 'Already did', code: 'already-did' });
       return;
     }
