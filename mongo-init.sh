@@ -1,7 +1,7 @@
 . ./.env
 
 # run mongo
-. mongo.sh
+. ./mongo.sh
 
 # Wait for MongoDB to start
 echo "=> Waiting for MongoDB to start..."

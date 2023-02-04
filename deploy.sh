@@ -1,7 +1,7 @@
 . ./.env
 
 # git pull
-. git-pull.sh
+. ./git-pull.sh
 
 # restart docker-compose
-. docker-compose-restart.sh
+. ./docker-compose-restart.sh
