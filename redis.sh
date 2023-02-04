@@ -4,12 +4,8 @@ docker pull redis
 
 # stop container
 echo "=> Stop previous container..."
-docker stop redis-container
-
-# remove container
-echo "=> Remove previous container..."
-docker rm -f redis-container
+docker stop waf-redis
 
 # run redis
 echo "=> Run redis..."
-docker run -d -p 6379:6379 --name redis-container redis
+docker run --rm -d -p 6379:6379 --name waf-redis redis
