@@ -11,12 +11,13 @@ const moment = require('moment');
 const cookieParser = require('cookie-parser');
 
 const routes = require('../routes/v1');
+const { env } = require('./vars');
 
 const app = express();
 
 morgan.token('date', () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
 
-if (process.env.NODE_ENV === 'development') {
+if (env === 'development') {
   app.use(morgan('dev'));
 } else {
   app.use(

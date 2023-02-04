@@ -1,23 +1,15 @@
-. ./.env
-
-# git pull
-echo "=> Git pull..."
-git pull https://${GITHUB_ID}:${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git
-
 # stop container
 echo "=> Stop previous container..."
-docker stop ${CONTAINER_NAME}
+docker stop waf-server
 
 # remove image
 echo "=> Remove previous image..."
-docker rmi -f ${DOCKER_USER_NAME}/${IMAGE_NAME}:${VERSION}
+docker rmi -f mihilt/waf-server:latest
 
 # new-build/re-build docker image
 echo "=> Build new image..."
-docker build --tag ${DOCKER_USER_NAME}/${IMAGE_NAME}:${VERSION} .
+docker build --tag mihilt/waf-server:latest .
 
 # Run container
 echo "=> Run container..."
-docker run --rm -d -p ${PORT}:${PORT} --name ${CONTAINER_NAME} ${DOCKER_USER_NAME}/${IMAGE_NAME}:${VERSION}
-
-# TODO: deploy docs to 80 port
+docker run --rm -d -p 8080:8080 --name waf-server mihilt/waf-server:latest

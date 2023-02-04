@@ -1,10 +1,10 @@
-# pull redis
-echo "=> Pull redis image..."
-docker pull redis
-
 # stop container
 echo "=> Stop previous container..."
 docker stop waf-redis
+
+# pull redis
+echo "=> Pull redis image..."
+docker pull redis
 
 # run redis
 echo "=> Run redis..."

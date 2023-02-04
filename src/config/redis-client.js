@@ -1,6 +1,9 @@
-const redis = require('redis');
+const { createClient } = require('redis');
+const { redisHost } = require('./vars');
 
-const redisClient = redis.createClient(6379);
+const redisClient = createClient({
+  url: `redis://${redisHost}:6379`,
+});
 
 redisClient.on('error', err => {
   // eslint-disable-next-line no-console
