@@ -1,3 +1,4 @@
+const redisClient = require('../config/redis-client');
 const Comment = require('../models/comment');
 const Post = require('../models/post');
 const { checkRequiredFields } = require('../utils');
@@ -80,6 +81,18 @@ exports.likeComment = async (req, res, next) => {
 
     checkRequiredFields({ postId, commentId });
 
+    const refinedIp = req.ip.replace(/^.*:/, '');
+    const redisKey = `like:${refinedIp}:comments`;
+    const redisValue = `${postId}:${commentId}`;
+    const sAddResult = await redisClient.sAdd(redisKey, redisValue);
+
+    if (sAddResult === 0) {
+      res.status(409).json({ message: 'Already did', code: 'already-did' });
+      return;
+    }
+
+    await redisClient.expire(redisKey, 60 * 60 * 24);
+
     const comment = await Comment.findOneAndUpdate(
       { postId, commentId },
       { $inc: { like: 1 } },
@@ -103,6 +116,18 @@ exports.dislikeComment = async (req, res, next) => {
     const { postId, commentId } = req.body;
 
     checkRequiredFields({ postId, commentId });
+
+    const refinedIp = req.ip.replace(/^.*:/, '');
+    const redisKey = `like:${refinedIp}:comments`;
+    const redisValue = `${postId}:${commentId}`;
+    const sAddResult = await redisClient.sAdd(redisKey, redisValue);
+
+    if (sAddResult === 0) {
+      res.status(409).json({ message: 'Already did', code: 'already-did' });
+      return;
+    }
+
+    await redisClient.expire(redisKey, 60 * 60 * 24);
 
     const comment = await Comment.findOneAndUpdate(
       { postId, commentId },

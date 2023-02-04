@@ -3,6 +3,7 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Category = require('../models/category');
 const { getCategoryService } = require('../services/category');
+const redisClient = require('../config/redis-client');
 
 exports.getPosts = async (req, res, next) => {
   try {
@@ -229,15 +230,22 @@ exports.checkPasswordPost = async (req, res, next) => {
   }
 };
 
-/**
- * TODO: like, dislike 서버단 조작 방지 필요
- *
- */
 exports.likePost = async (req, res, next) => {
   try {
     const { postId } = req.body;
 
     checkRequiredFields({ postId });
+
+    const refinedIp = req.ip.replace(/^.*:/, '');
+    const redisKey = `like:${refinedIp}:posts`;
+    const sAddResult = await redisClient.sAdd(redisKey, postId.toString());
+
+    if (sAddResult === 0) {
+      res.status(409).json({ message: 'Already did', code: 'already-did' });
+      return;
+    }
+
+    await redisClient.expire(redisKey, 60 * 60 * 24);
 
     const post = await Post.findOneAndUpdate(
       { postId },
@@ -260,8 +268,18 @@ exports.likePost = async (req, res, next) => {
 exports.dislikePost = async (req, res, next) => {
   try {
     const { postId } = req.body;
-
     checkRequiredFields({ postId });
+
+    const refinedIp = req.ip.replace(/^.*:/, '');
+    const redisKey = `like:${refinedIp}:posts`;
+    const sAddResult = await redisClient.sAdd(redisKey, postId.toString());
+
+    if (sAddResult === 0) {
+      res.status(409).json({ message: 'Already did', code: 'already-did' });
+      return;
+    }
+
+    await redisClient.expire(redisKey, 60 * 60 * 24);
 
     const post = await Post.findOneAndUpdate(
       { postId },
