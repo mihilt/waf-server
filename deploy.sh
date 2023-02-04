@@ -4,4 +4,4 @@
 . ./git-pull.sh
 
 # restart docker-compose
-. ./docker-compose-restart.sh
+. ./restart-docker-compose.sh

@@ -6,7 +6,8 @@ services:
       context: ./
       dockerfile: ./express.Dockerfile
     volumes:
-      - ~/docker-data/waf-uploads:/app/public/uploads
+      - ~/docker-data/waf/uploads:/app/public/uploads
+      - ~/docker-data/waf/logs:/app/logs
     ports:
       - '8080:8080'
     depends_on:
@@ -20,7 +21,7 @@ services:
   mongodb:
     image: mongo
     volumes:
-      - ~/docker-data/mongodb:/data/db
+      - ~/docker-data/waf/mongodb:/data/db
     ports:
       - '27017:27017'
     environment:

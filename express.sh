@@ -12,4 +12,10 @@ docker build --tag mihilt/waf-server:latest .
 
 # Run container
 echo "=> Run container..."
-docker run --rm -d -p 8080:8080 --name waf-server mihilt/waf-server:latest
+docker run --rm \
+  -d \
+  --name waf-server \
+  -p 8080:8080 \
+  -v ~/docker-data/waf/uploads:/app/public/uploads \
+  -v ~/docker-data/waf/logs:/app/logs \
+  mihilt/waf-server:latest
