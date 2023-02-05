@@ -35,7 +35,7 @@ exports.postComment = async (req, res, next) => {
       author,
       content,
       password: commentPassword,
-      ip: req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, ''),
+      ip: req.ip.replace(/^.*:/, ''),
       commentId: (await Comment.countDocuments({ postId })) + 1,
       parentCommentId,
     });
@@ -81,7 +81,7 @@ exports.likeComment = async (req, res, next) => {
 
     checkRequiredFields({ postId, commentId });
 
-    const refinedIp = req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, '');
+    const refinedIp = req.ip.replace(/^.*:/, '');
     const redisKey = `like:${refinedIp}:comments`;
     const redisValue = `${postId}:${commentId}`;
     const sAddResult = await redisClient.sAdd(redisKey, redisValue);
@@ -117,7 +117,7 @@ exports.dislikeComment = async (req, res, next) => {
 
     checkRequiredFields({ postId, commentId });
 
-    const refinedIp = req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, '');
+    const refinedIp = req.ip.replace(/^.*:/, '');
     const redisKey = `like:${refinedIp}:comments`;
     const redisValue = `${postId}:${commentId}`;
     const sAddResult = await redisClient.sAdd(redisKey, redisValue);

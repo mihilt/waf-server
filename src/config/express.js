@@ -15,9 +15,9 @@ const { env } = require('./vars');
 
 const app = express();
 
-morgan.token('date', () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
+app.set('trust proxy', true);
 
-morgan.token('client-ip', req => req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, ''));
+morgan.token('date', () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
 
 if (env === 'development') {
   app.use(morgan('dev'));

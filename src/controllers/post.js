@@ -128,7 +128,7 @@ exports.postPost = async (req, res, next) => {
 
     // TODO: 글 등록 A 권한 체크
 
-    const refinedIp = req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, '');
+    const refinedIp = req.ip.replace(/^.*:/, '');
 
     const post = await Post.create({
       categoryId,
@@ -236,7 +236,7 @@ exports.likePost = async (req, res, next) => {
 
     checkRequiredFields({ postId });
 
-    const refinedIp = req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, '');
+    const refinedIp = req.ip.replace(/^.*:/, '');
     const redisKey = `like:${refinedIp}:posts`;
     const sAddResult = await redisClient.sAdd(redisKey, postId.toString());
 
