@@ -6,7 +6,6 @@ const compression = require('compression');
 const methodOverride = require('method-override');
 const morgan = require('morgan');
 const rfs = require('rotating-file-stream');
-const path = require('path');
 const moment = require('moment');
 const cookieParser = require('cookie-parser');
 
@@ -17,7 +16,7 @@ const app = express();
 
 app.set('trust proxy', true);
 
-morgan.token('date', () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
+morgan.token('date', () => moment().utcOffset('+0900').format('YYYY-MM-DD HH:mm:ss'));
 
 if (env === 'development') {
   app.use(morgan('dev'));
@@ -26,12 +25,7 @@ if (env === 'development') {
     morgan('combined', {
       stream: rfs.createStream('access.log', {
         interval: '1d',
-        path: path.join(
-          './logs',
-          new Date().getFullYear().toString(),
-          new Date().getMonth().toString(),
-          new Date().getDate().toString(),
-        ),
+        path: './logs/access',
       }),
     }),
   );
