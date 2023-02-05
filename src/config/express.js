@@ -17,6 +17,8 @@ const app = express();
 
 morgan.token('date', () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss'));
 
+morgan.token('client-ip', req => req.headers['x-forwarded-for'] || req.ip.replace(/^.*:/, ''));
+
 if (env === 'development') {
   app.use(morgan('dev'));
 } else {
